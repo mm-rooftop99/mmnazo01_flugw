@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>インフルのGWでした【mmの謎解き#1】</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      touch-action: manipulation;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #141414;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #fff;
+      position: relative;
+    }
+
+    button,
+    .button,
+    .reset-button,
+    .hint-version-link,
+    .explanation-box,
+    .answer-button,
+    .post-button,
+    .clear-close-button,
+    .explanation-close-button {
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: clamp(20px, 4vw, 56px);
+    }
+
+    .info-box {
+      position: fixed;
+      top: clamp(16px, 3vw, 32px);
+      right: clamp(16px, 3vw, 40px);
+      color: #ddd;
+      line-height: 1.8;
+      z-index: 2;
+      text-align: right;
+      white-space: nowrap;
+    }
+
+    .info-title {
+      font-size: clamp(13px, 1.3vw, 16px);
+      font-weight: bold;
+      color: #fff;
+    }
+
+    .info-text {
+      font-size: clamp(12px, 1.1vw, 14px);
+    }
+
+    .side-area {
+      position: fixed;
+      left: clamp(16px, 3vw, 40px);
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: clamp(12px, 2vw, 20px);
+      z-index: 2;
+    }
+
+    .hint-version-link,
+    .explanation-box {
+      width: clamp(90px, 10vw, 130px);
+      min-height: clamp(46px, 6vw, 64px);
+      border: 3px solid #555;
+      border-radius: 12px;
+      background: #1f1f1f;
+      color: #ddd;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: clamp(12px, 1.5vw, 16px);
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+      padding: 8px;
+      text-align: center;
+      text-decoration: none;
+      line-height: 1.4;
+    }
+
+    .hint-version-link:hover,
+    .explanation-box:hover {
+      background: #292929;
+    }
+
+    .hint-version-link {
+      border-color: #777;
+    }
+
+    .explanation-box {
+      border-color: #00ff66;
+      color: #00ff66;
+      display: none;
+    }
+
+    .container {
+      text-align: center;
+      width: min(100%, 620px);
+    }
+
+    .monitor {
+      width: clamp(180px, 32vw, 260px);
+      height: clamp(180px, 32vw, 260px);
+      background: #111;
+      color: #00ff66;
+      border: clamp(6px, 1vw, 8px) solid #333;
+      border-radius: 16px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: clamp(44px, 8vw, 72px);
+      font-weight: bold;
+      letter-spacing: 2px;
+      margin: 0 auto clamp(28px, 5vw, 40px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: clamp(12px, 3vw, 24px);
+      margin-bottom: clamp(28px, 5vw, 40px);
+      flex-wrap: nowrap;
+    }
+
+    .button {
+      width: clamp(52px, 10vw, 64px);
+      height: clamp(52px, 10vw, 64px);
+      border-radius: 50%;
+      border: clamp(3px, 0.8vw, 4px) solid #333;
+      background: #ddd;
+      cursor: pointer;
+      font-size: 0;
+      font-weight: bold;
+      color: #111;
+      box-shadow: 0 6px 0 #999;
+      transition: transform 0.1s, box-shadow 0.1s;
+      flex: 0 0 auto;
+    }
+
+    .button:active {
+      transform: translateY(6px);
+      box-shadow: 0 0 0 #999;
+    }
+
+    .reset-button {
+      min-width: clamp(74px, 15vw, 92px);
+      height: clamp(52px, 10vw, 64px);
+      padding: 0 clamp(10px, 2vw, 16px);
+      border-radius: 999px;
+      border: clamp(3px, 0.8vw, 4px) solid #333;
+      background: #ddd;
+      color: #111;
+      cursor: pointer;
+      font-size: clamp(13px, 2.5vw, 18px);
+      font-weight: bold;
+      box-shadow: 0 6px 0 #999;
+      transition: transform 0.1s, box-shadow 0.1s;
+      flex: 0 0 auto;
+    }
+
+    .reset-button:active {
+      transform: translateY(6px);
+      box-shadow: 0 0 0 #999;
+    }
+
+    .answer-area {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .answer-input {
+      width: min(56vw, 240px);
+      padding: clamp(10px, 2vw, 12px);
+      font-size: clamp(16px, 3vw, 18px);
+      border-radius: 8px;
+      border: 2px solid #333;
+      outline: none;
+    }
+
+    .answer-button {
+      padding: clamp(10px, 2vw, 12px) clamp(16px, 3vw, 20px);
+      font-size: clamp(16px, 3vw, 18px);
+      font-weight: bold;
+      border-radius: 8px;
+      border: 2px solid #333;
+      background: #ddd;
+      cursor: pointer;
+    }
+
+    .message {
+      height: 36px;
+      font-size: clamp(20px, 4vw, 24px);
+      font-weight: bold;
+      color: #00ff66;
+    }
+
+    .clear-overlay,
+    .explanation-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.65);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+      padding: 20px;
+    }
+
+    .clear-overlay {
+      background: rgba(0, 0, 0, 0.72);
+      z-index: 20;
+    }
+
+    .clear-box {
+      position: relative;
+      width: min(90vw, 560px);
+      padding: clamp(32px, 7vw, 56px);
+      border: 4px solid #00ff66;
+      border-radius: 24px;
+      background: #111;
+      text-align: center;
+      box-shadow: 0 0 32px rgba(0, 255, 102, 0.35);
+    }
+
+    .clear-close-button {
+      position: absolute;
+      top: 14px;
+      right: 18px;
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .clear-close-button:hover {
+      color: #00ff66;
+    }
+
+    .clear-title {
+      font-size: clamp(48px, 12vw, 88px);
+      font-weight: bold;
+      color: #00ff66;
+      margin-bottom: 16px;
+      letter-spacing: 2px;
+    }
+
+    .clear-work-title {
+      font-size: clamp(18px, 4vw, 26px);
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 32px;
+      line-height: 1.5;
+    }
+
+    .post-button {
+      display: inline-block;
+      padding: 14px 32px;
+      border-radius: 999px;
+      border: 2px solid #fff;
+      background: #fff;
+      color: #111;
+      font-size: 20px;
+      font-weight: bold;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform 0.1s, background 0.1s;
+    }
+
+    .post-button:hover {
+      background: #e8e8e8;
+    }
+
+    .post-button:active {
+      transform: translateY(3px);
+    }
+
+    .explanation-overlay {
+      z-index: 30;
+      background: rgba(0, 0, 0, 0.72);
+    }
+
+    .explanation-modal {
+      position: relative;
+      width: min(92vw, 720px);
+      max-height: 84vh;
+      overflow-y: auto;
+      padding: clamp(24px, 5vw, 40px);
+      background: #202020;
+      border: 3px solid #00ff66;
+      border-radius: 18px;
+      box-shadow: 0 0 32px rgba(0, 255, 102, 0.25);
+    }
+
+    .explanation-close-button {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border: none;
+      background: transparent;
+      color: #fff;
+      font-size: 32px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .explanation-close-button:hover {
+      color: #00ff66;
+    }
+
+    .explanation-title {
+      font-size: clamp(22px, 4vw, 30px);
+      font-weight: bold;
+      color: #00ff66;
+      margin-bottom: 24px;
+    }
+
+    .explanation-text {
+      font-size: clamp(15px, 2.6vw, 18px);
+      line-height: 1.9;
+      white-space: pre-line;
+      color: #eee;
+      text-align: left;
+    }
+
+    @media (max-width: 800px) {
+      .page {
+        align-items: flex-start;
+        padding-top: 190px;
+      }
+
+      .info-box {
+        position: absolute;
+        top: 16px;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
+        width: auto;
+        max-width: 96vw;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .side-area {
+        position: absolute;
+        top: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        flex-direction: row;
+        justify-content: center;
+        width: 100%;
+      }
+
+      .hint-version-link,
+      .explanation-box {
+        width: min(34vw, 130px);
+        min-height: 48px;
+        font-size: 13px;
+      }
+
+      .monitor {
+        width: min(64vw, 240px);
+        height: min(64vw, 240px);
+      }
+
+      .buttons {
+        gap: 10px;
+        padding: 0 10px;
+      }
+
+      .button {
+        width: min(15vw, 56px);
+        height: min(15vw, 56px);
+      }
+
+      .reset-button {
+        min-width: min(21vw, 82px);
+        height: min(15vw, 56px);
+        font-size: 13px;
+        padding: 0 10px;
+      }
+
+      .answer-area {
+        width: 100%;
+        padding: 0 16px;
+      }
+
+      .answer-input {
+        width: min(58vw, 240px);
+      }
+    }
+
+    @media (max-width: 420px) {
+      .page {
+        padding-top: 200px;
+      }
+
+      .info-title {
+        font-size: 14px;
+      }
+
+      .info-text {
+        font-size: 12px;
+      }
+
+      .buttons {
+        gap: 8px;
+      }
+
+      .answer-area {
+        flex-direction: column;
+        align-items: center;
+      }
+
+      .answer-input,
+      .answer-button {
+        width: min(78vw, 260px);
+      }
+
+      .hint-version-link,
+      .explanation-box {
+        width: min(42vw, 150px);
+        font-size: 13px;
+      }
+
+      .reset-button {
+        font-size: 12px;
+        min-width: 68px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="info-box">
+    <div class="info-title">インフルのGWでした【mmの謎解き#1】</div>
+    <div class="info-text">想定クリア時間：60min</div>
+    <div class="info-text">公開：2026年5月6日</div>
+    <div class="info-text">制作：mm（@mm_syumida） #mmの謎解き</div>
+  </div>
+
+  <div class="side-area">
+    <a
+      class="hint-version-link"
+      href="https://mm-rooftop99.github.io/mmnazo01_flugw_hint/"
+      target="_blank"
+      rel="noopener noreferrer"
+    >
+      ヒント版はこちら
+    </a>
+
+    <div class="explanation-box" id="explanationBox" onclick="openExplanation()">解説</div>
+  </div>
+
+  <div class="page">
+    <div class="container">
+      <div class="monitor" id="monitor">23</div>
+
+      <div class="buttons">
+        <button class="button" id="upButton" onclick="move(-1, 0)">↑</button>
+        <button class="button" id="downButton" onclick="move(1, 0)">↓</button>
+        <button class="button" id="leftButton" onclick="move(0, -1)">←</button>
+        <button class="button" id="rightButton" onclick="move(0, 1)">→</button>
+        <button class="reset-button" onclick="resetPosition()">RESET</button>
+      </div>
+
+      <div class="answer-area">
+        <input
+          type="text"
+          id="answerInput"
+          class="answer-input"
+          placeholder="答えを入力"
+        />
+        <button class="answer-button" onclick="checkAnswer()">=CLEAR</button>
+      </div>
+
+      <div class="message" id="message"></div>
+    </div>
+  </div>
+
+  <div class="clear-overlay" id="clearOverlay">
+    <div class="clear-box">
+      <button class="clear-close-button" onclick="closeClearScreen()">×</button>
+      <div class="clear-title">CLEAR！</div>
+      <div class="clear-work-title">インフルのGWでした【mmの謎解き#1】</div>
+      <a class="post-button" id="postButton" href="#" target="_blank" rel="noopener noreferrer">Post</a>
+    </div>
+  </div>
+
+  <div class="explanation-overlay" id="explanationOverlay">
+    <div class="explanation-modal">
+      <button class="explanation-close-button" onclick="closeExplanation()">×</button>
+      <div class="explanation-title">解説</div>
+      <div class="explanation-text">4つのボタンは左から順に「上」「下」「左」「右」の役割を持つ。
+押したボタンに応じて、50音表上を移動する。ただし、かながない箇所には移動できない。
+
+アルファベットA～Zを1～26の数字に変換している。
+50音をキーボード入力で打つ際のアルファベットの積を50音表上に表示している。
+たとえば「あ」は「a」なので「1」、「を」は「wo」なので23×15=「345」。
+※「ち」＝「ti」としていたり、「ふ」＝「hu」としていたり、厳密さ?にはやや欠ける点があることはご容赦いただきたい
+
+入力すべき答えはCLEARだ。つまり、3×12×5×1×18=3240が答えである。
+※解答フォームの送信ボタンが「=CLEAR」である点や、誤りの解答を入力すると表示される「Not “CLEAR”・・・」から推察可能</div>
+    </div>
+  </div>
+
+  <script>
+    const kanaTable = [
+      ["ん", "わ", "ら", "や", "ま", "は", "な", "た", "さ", "か", "あ"],
+      ["－", "－", "り", "－", "み", "ひ", "に", "ち", "し", "き", "い"],
+      ["－", "－", "る", "ゆ", "む", "ふ", "ぬ", "つ", "す", "く", "う"],
+      ["－", "－", "れ", "－", "め", "へ", "ね", "て", "せ", "け", "え"],
+      ["－", "を", "ろ", "よ", "も", "ほ", "の", "と", "そ", "こ", "お"]
+    ];
+
+    const romajiMap = {
+      "あ": "a",
+      "い": "i",
+      "う": "u",
+      "え": "e",
+      "お": "o",
+
+      "か": "ka",
+      "き": "ki",
+      "く": "ku",
+      "け": "ke",
+      "こ": "ko",
+
+      "さ": "sa",
+      "し": "si",
+      "す": "su",
+      "せ": "se",
+      "そ": "so",
+
+      "た": "ta",
+      "ち": "ti",
+      "つ": "tu",
+      "て": "te",
+      "と": "to",
+
+      "な": "na",
+      "に": "ni",
+      "ぬ": "nu",
+      "ね": "ne",
+      "の": "no",
+
+      "は": "ha",
+      "ひ": "hi",
+      "ふ": "hu",
+      "へ": "he",
+      "ほ": "ho",
+
+      "ま": "ma",
+      "み": "mi",
+      "む": "mu",
+      "め": "me",
+      "も": "mo",
+
+      "や": "ya",
+      "ゆ": "yu",
+      "よ": "yo",
+
+      "ら": "ra",
+      "り": "ri",
+      "る": "ru",
+      "れ": "re",
+      "ろ": "ro",
+
+      "わ": "wa",
+      "を": "wo",
+      "ん": "nn"
+    };
+
+    const correctAnswer = "3240";
+
+    const initialRow = 0;
+    const initialCol = 1;
+
+    let row = initialRow;
+    let col = initialCol;
+    let messageTimer = null;
+
+    function alphabetToNumber(char) {
+      return char.charCodeAt(0) - 96;
+    }
+
+    function romajiToNumbers(romaji) {
+      return romaji.split("").map(function(char) {
+        return alphabetToNumber(char);
+      });
+    }
+
+    function romajiToProduct(romaji) {
+      const numbers = romajiToNumbers(romaji);
+
+      return numbers.reduce(function(product, number) {
+        return product * number;
+      }, 1);
+    }
+
+    function getCurrentRomaji() {
+      const kana = kanaTable[row][col];
+      return romajiMap[kana];
+    }
+
+    function updateMonitor() {
+      const romaji = getCurrentRomaji();
+      const monitor = document.getElementById("monitor");
+
+      monitor.textContent = romajiToProduct(romaji);
+    }
+
+    function move(rowMove, colMove) {
+      const nextRow = row + rowMove;
+      const nextCol = col + colMove;
+
+      if (
+        nextRow < 0 ||
+        nextRow >= kanaTable.length ||
+        nextCol < 0 ||
+        nextCol >= kanaTable[0].length
+      ) {
+        return;
+      }
+
+      if (kanaTable[nextRow][nextCol] === "－") {
+        return;
+      }
+
+      row = nextRow;
+      col = nextCol;
+      updateMonitor();
+    }
+
+    function resetPosition() {
+      row = initialRow;
+      col = initialCol;
+      updateMonitor();
+    }
+
+    function normalizeAnswer(text) {
+      return text
+        .trim()
+        .replace(/[０-９]/g, function(char) {
+          return String.fromCharCode(char.charCodeAt(0) - 0xFEE0);
+        });
+    }
+
+    function checkAnswer() {
+      const input = normalizeAnswer(document.getElementById("answerInput").value);
+      const message = document.getElementById("message");
+
+      if (messageTimer !== null) {
+        clearTimeout(messageTimer);
+        messageTimer = null;
+      }
+
+      if (input === correctAnswer) {
+        message.textContent = "";
+        showClearScreen();
+        showExplanationBox();
+      } else {
+        message.textContent = 'Not “CLEAR”・・・';
+
+        messageTimer = setTimeout(function() {
+          message.textContent = "";
+          messageTimer = null;
+        }, 5000);
+      }
+    }
+
+    function showClearScreen() {
+      const postText =
+        "インフルのGWでした【mmの謎解き#1】をクリアしました！\n#mmの謎解き #インフルのGWでした";
+
+      const pageUrl = location.href;
+      const postUrl =
+        "https://twitter.com/intent/tweet?text=" +
+        encodeURIComponent(postText) +
+        "&url=" +
+        encodeURIComponent(pageUrl);
+
+      document.getElementById("postButton").href = postUrl;
+      document.getElementById("clearOverlay").style.display = "flex";
+    }
+
+    function closeClearScreen() {
+      document.getElementById("clearOverlay").style.display = "none";
+    }
+
+    function showExplanationBox() {
+      document.getElementById("explanationBox").style.display = "flex";
+    }
+
+    function openExplanation() {
+      document.getElementById("explanationOverlay").style.display = "flex";
+    }
+
+    function closeExplanation() {
+      document.getElementById("explanationOverlay").style.display = "none";
+    }
+
+    document.getElementById("answerInput").addEventListener("keydown", function(event) {
+      if (event.key === "Enter") {
+        checkAnswer();
+      }
+    });
+  </script>
+</body>
+</html>
